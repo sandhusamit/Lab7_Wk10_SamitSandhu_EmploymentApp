@@ -25,9 +25,9 @@ public class SQLManager {
     }
 
     // Method to get a single application by id
-    public Application getApplicationById(int id) {
+    public EmploymentApplication getApplicationById(int id) {
         String query = "SELECT * FROM applications WHERE id = ?";
-        Application app = null;
+        EmploymentApplication app = null;
 
         try (Connection con = DriverManager.getConnection(url, username, password);
              PreparedStatement pst = con.prepareStatement(query)) {
@@ -35,7 +35,7 @@ public class SQLManager {
             pst.setInt(1, id); // Set the id parameter
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    app = new Application(
+                    app = new EmploymentApplication(
                         rs.getInt("id"),
                         rs.getString("firstName"),
                         rs.getString("lastName"),
@@ -56,8 +56,8 @@ public class SQLManager {
         return app; // Will return null if no application with this ID exists
     }
     // Method to get all applications
-    public List<Application> getApplications() {
-        List<Application> applications = new ArrayList<>();
+    public List<EmploymentApplication> getApplications() {
+        List<EmploymentApplication> applications = new ArrayList<>();
         String query = "SELECT * FROM applications";
 
         try (Connection con = DriverManager.getConnection(url, username, password);
@@ -65,7 +65,7 @@ public class SQLManager {
              ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
-                Application app = new Application(
+                EmploymentApplication app = new EmploymentApplication(
                     rs.getInt("id"),
                     rs.getString("firstName"),
                     rs.getString("lastName"),

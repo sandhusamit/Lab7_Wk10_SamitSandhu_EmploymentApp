@@ -2,6 +2,7 @@ package application;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -101,6 +102,7 @@ public class Main extends Application {
         // === Button ===
         Button submitBtn = new Button("Send Application");
         Button viewBtn = new Button("Review Application");
+        Button clearBtn = new Button("Clear Application");
         HBox btnBox = new HBox(submitBtn, viewBtn);
         btnBox.setAlignment(Pos.CENTER);
         btnBox.setPadding(new Insets(5, 0, 0, 0));
@@ -112,12 +114,123 @@ public class Main extends Application {
             firstTxt, lastTxt, emailField, positionField, phoneField,
             startDatePicker, relocateGroup, ta
         );
-
-        submitBtn.setOnAction(submitHandler);
-
+        
+        
         
         // Event Handling
-        submitBtn.setOnAction(submitHandler);        
+        submitBtn.setOnAction(submitHandler);      
+        clearBtn.setOnAction(event -> {
+        	Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        	alert.setTitle("Warning!");
+        	alert.setHeaderText("Are you sure you’d like to clear the application without saving?");
+        	alert.setContentText("All entered data will be lost.");
+
+        	Optional<ButtonType> result = alert.showAndWait();
+
+        	if (result.isPresent() && result.get() == ButtonType.OK) {
+        	    // ✅ user confirmed
+            	System.out.println("Application Cleared");
+                //Set the visible form inputs to show application details
+            	firstTxt.clear();
+                //Set it so that user cannot edit whats shown
+                firstTxt.setEditable(true);
+                
+                lastTxt.clear();
+                lastTxt.setEditable(true);
+                
+                emailField.clear();
+                emailField.setEditable(true);
+                
+                positionField.clear();
+                positionField.setEditable(true);
+                
+                phoneField.clear();
+                phoneField.setEditable(true);
+                
+                startDatePicker.setEditable(true);
+                startDatePicker.setDisable(false); // unlock
+
+        		yes.setSelected(false);
+        		no.setSelected(false);
+        		unsure.setSelected(false);
+
+        		yes.setDisable(false);
+        		no.setDisable(false);
+        		unsure.setDisable(false);
+                
+                
+                
+        		ta.clear();
+        		ta.setEditable(true);
+        	    // clear fields here
+        	} else {
+        	    // ❌ user canceled
+        	    System.out.println("Canceled.");
+        	}
+
+         
+
+        });
+        
+        viewBtn.setOnAction(event -> {
+            ReaderHandler readerHandler = new ReaderHandler();
+            readerHandler.handle(event); // Run your reader logic - will fetch application from DB + assign to readerHandler.application
+            
+            // Then do whatever else you need
+            System.out.println("Application ID: " + readerHandler.getId());
+            EmploymentApplication app = readerHandler.getApplication();
+            if (app != null) {
+                
+            	//Let console know which applicant is retrieved 
+            	System.out.println("Application retrieved: " + app.getFirstName());
+                //Set the visible form inputs to show application details
+            	firstTxt.setText(app.getFirstName());
+                //Set it so that user cannot edit whats shown
+                firstTxt.setEditable(false);
+                
+                lastTxt.setText(app.getLastName());
+                lastTxt.setEditable(false);
+                
+                emailField.setText(app.getEmail());
+                emailField.setEditable(false);
+                
+                positionField.setText(app.getPosition());
+                positionField.setEditable(false);
+                
+                phoneField.setText(app.getPhone());
+                phoneField.setEditable(false);
+                
+                //Date picker must be locked and set 
+                Date date = app.getStartDate(); // java.sql.Date
+                startDatePicker.setValue(date.toLocalDate()); // convert safely
+                startDatePicker.setEditable(false);
+                startDatePicker.setDisable(true); // fully lock
+
+                //Toggle group selection + lock
+                switch(app.getRelocate())
+                {
+                	case "Yes":
+                		yes.setSelected(true);
+                	case "No":
+                		no.setSelected(true);
+                	default:
+                		unsure.setSelected(true);
+
+                }
+        		yes.setDisable(true);
+        		no.setDisable(true);
+        		unsure.setDisable(true);
+                
+                
+                
+                ta.setText(app.getComments() + "\nThe fields for the application you've selected has been filled above.");
+                ta.setEditable(false);
+            }
+            else {
+            	System.out.println("No App Retrieved!");
+            }
+        });        
+        
         mainPane.setCenter(pane);
 
         // ===== Bottom Date =====
@@ -133,8 +246,9 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
+    
     public static void main(String[] args) {
         launch(args);
     }
+    
 }

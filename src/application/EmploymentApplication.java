@@ -1,6 +1,6 @@
 package application;
 
-public class Application {
+public class EmploymentApplication {
     private int id;
     private String firstName;
     private String lastName;
@@ -11,7 +11,7 @@ public class Application {
     private String relocate;
     private String comments;
 
-    public Application(int id, String firstName, String lastName, String email,
+    public EmploymentApplication(int id, String firstName, String lastName, String email,
                        String position, String phone, java.sql.Date startDate,
                        String relocate, String comments) {
         this.id = id;
