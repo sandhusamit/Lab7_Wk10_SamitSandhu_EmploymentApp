@@ -28,24 +28,32 @@ public class SQLManager {
     public EmploymentApplication getApplicationById(int id) {
         String query = "SELECT * FROM applications WHERE id = ?";
         EmploymentApplication app = null;
-
+// PREPARED STATEMENT 
         try (Connection con = DriverManager.getConnection(url, username, password);
              PreparedStatement pst = con.prepareStatement(query)) {
 
             pst.setInt(1, id); // Set the id parameter
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    app = new EmploymentApplication(
-                        rs.getInt("id"),
-                        rs.getString("firstName"),
-                        rs.getString("lastName"),
-                        rs.getString("email"),
-                        rs.getString("position"),
-                        rs.getString("phone"),
-                        rs.getDate("startDate"),
-                        rs.getString("relocate"),
-                        rs.getString("comments")
-                    );
+                	app = new EmploymentApplication(
+                		    rs.getInt("id"),
+                		    rs.getString("fullName"),
+                		    rs.getString("currentAddress"),
+                		    rs.getString("phone"),
+                		    rs.getString("email"),
+                		    rs.getString("highestEducation"),
+                		    Gender.valueOf(rs.getString("gender").toUpperCase()),  // conversion here
+                		    rs.getDate("startDate"),
+                		    rs.getString("position"),
+                		    rs.getDouble("desiredSal"),
+                		    rs.getBoolean("isAuthorized"),
+                		    rs.getBoolean("relatedEmployees"),
+                		    rs.getString("relativeExplain"),
+                		    rs.getString("relocate"),
+                		    rs.getString("comments"),
+                		    rs.getString("signaturePic")
+                		);
+
                 }
             }
 
@@ -65,17 +73,24 @@ public class SQLManager {
              ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
-                EmploymentApplication app = new EmploymentApplication(
-                    rs.getInt("id"),
-                    rs.getString("firstName"),
-                    rs.getString("lastName"),
-                    rs.getString("email"),
-                    rs.getString("position"),
-                    rs.getString("phone"),
-                    rs.getDate("startDate"),
-                    rs.getString("relocate"),
-                    rs.getString("comments")
-                );
+            	EmploymentApplication app = new EmploymentApplication(
+            		    rs.getInt("id"),
+            		    rs.getString("fullName"),
+            		    rs.getString("currentAddress"),
+            		    rs.getString("phone"),
+            		    rs.getString("email"),
+            		    rs.getString("highestEducation"),
+            		    Gender.valueOf(rs.getString("gender").toUpperCase()),  // conversion here
+            		    rs.getDate("startDate"),
+            		    rs.getString("position"),
+            		    rs.getDouble("desiredSal"),
+            		    rs.getBoolean("isAuthorized"),
+            		    rs.getBoolean("relatedEmployees"),
+            		    rs.getString("relativeExplain"),
+            		    rs.getString("relocate"),
+            		    rs.getString("comments"),
+            		    rs.getString("signaturePic")
+            		);
                 applications.add(app);
             }
 
@@ -86,42 +101,57 @@ public class SQLManager {
         return applications;
     }
     // Method to insert a new application and give back the id
-	public int insertApplication(String firstName, String lastName, String email,
-	                             String position, String phone, java.sql.Date startDate,
-	                             String relocate, String comments) {
+	public int insertApplication(String fullName, String currentAddress, String phone, String email,
+	                             String highestEducation, Gender gender, java.sql.Date startDate,
+	                             String position, double desiredSal, boolean isAuthorized,
+	                             boolean relatedEmployees, String relativeExplain, String relocate,
+	                             String comments, String signaturePic) {
 	
-	    String query = "INSERT INTO applications (firstName, lastName, email, position, phone, startDate, relocate, comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	    String query = """
+	        INSERT INTO applications 
+	        (fullName, currentAddress, phone, email, highestEducation, gender, startDate, position, 
+	         desiredSal, isAuthorized, relatedEmployees, relativeExplain, relocate, comments, signaturePic)
+	        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	        """;
+	
 	    int generatedId = -1;
 	
 	    try (Connection con = DriverManager.getConnection(url, username, password);
 	         PreparedStatement pst = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 	
-	        pst.setString(1, firstName);
-	        pst.setString(2, lastName);
-	        pst.setString(3, email);
-	        pst.setString(4, position);
-	        pst.setString(5, phone);
-	        pst.setDate(6, startDate);
-	        pst.setString(7, relocate);
-	        pst.setString(8, comments);
+	        pst.setString(1, fullName);
+	        pst.setString(2, currentAddress);
+	        pst.setString(3, phone);
+	        pst.setString(4, email);
+	        pst.setString(5, highestEducation);
+	        pst.setString(6, gender.name()); // ✅ store enum as string (e.g. "MALE")
+	        pst.setDate(7, startDate);
+	        pst.setString(8, position);
+	        pst.setDouble(9, desiredSal);
+	        pst.setBoolean(10, isAuthorized);
+	        pst.setBoolean(11, relatedEmployees);
+	        pst.setString(12, relativeExplain);
+	        pst.setString(13, relocate);
+	        pst.setString(14, comments);
+	        pst.setString(15, signaturePic);
 	
 	        int rowsAffected = pst.executeUpdate();
 	
 	        if (rowsAffected > 0) {
 	            try (ResultSet rs = pst.getGeneratedKeys()) {
 	                if (rs.next()) {
-	                    generatedId = rs.getInt(1); // ✅ Grab the auto-generated ID
+	                    generatedId = rs.getInt(1);
 	                    System.out.println("✅ Insert successful! New application ID: " + generatedId);
 	                }
 	            }
 	        }
-	        
 	
 	    } catch (Exception e) {
 	        e.printStackTrace();
+	        System.out.println("❌ Failed to insert application.");
 	    }
 	
-	    return generatedId; // returns -1 if insert failed
+	    return generatedId;
 	}
 
 

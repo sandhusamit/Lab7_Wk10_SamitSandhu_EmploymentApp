@@ -1,33 +1,32 @@
 package application;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 public class Main extends Application {
+
     @Override
     public void start(Stage primaryStage) {
-
         // ===== Main Layout =====
         BorderPane mainPane = new BorderPane();
 
-        // ===== Top Image =====
+        // ===== Top Image and Title =====
         Image favSport = new Image(getClass().getResource("snowboard.jpg").toExternalForm());
         ImageView iv = new ImageView(favSport);
         iv.setFitWidth(180);
         iv.setPreserveRatio(true);
 
-        HBox topBox = new HBox(iv);
+        Label title = new Label("Employment Application");
+        HBox topBox = new HBox(15, iv, title);
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(10, 0, 5, 0));
         mainPane.setTop(topBox);
@@ -37,200 +36,110 @@ public class Main extends Application {
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(10));
         pane.setHgap(15);
-        pane.setVgap(6);
+        pane.setVgap(10);
 
-        // === Name Row ===
-        Label firstLbl = new Label("First Name");
-        TextField firstTxt = new TextField();
-        Label lastLbl = new Label("Last Name");
-        TextField lastTxt = new TextField();
-
-
-        VBox firstBox = new VBox(2, firstLbl, firstTxt);
-        VBox lastBox = new VBox(2, lastLbl, lastTxt);
-        HBox nameRow = new HBox(15, firstBox, lastBox);
+        // === Name & Address ===
+        Label fullNameLbl = new Label("Full Name");
+        TextField fullNameTxt = new TextField();
+        Label addyLbl = new Label("Current Address");
+        TextField addyTxt = new TextField();
+        VBox nameBoxLeft = new VBox(2, fullNameLbl, fullNameTxt);
+        VBox nameBoxRight = new VBox(2, addyLbl, addyTxt);
+        HBox nameRow = new HBox(15, nameBoxLeft, nameBoxRight);
         nameRow.setAlignment(Pos.CENTER_LEFT);
         pane.add(nameRow, 0, 0, 2, 1);
 
-        // === Email ===
-        pane.add(new Label("Email"), 0, 1);
-        TextField emailField = new TextField();
+        // === Contact Info ===
+        Label phoneLbl = new Label("Contact Number");
+        TextField phoneTxt = new TextField();
+        Label emailLbl = new Label("Email Address");
+        TextField emailTxt = new TextField();
+        VBox contactBox = new VBox(5, new HBox(10, phoneLbl, phoneTxt), new HBox(10, emailLbl, emailTxt));
+        contactBox.setAlignment(Pos.CENTER_LEFT);
+        pane.add(contactBox, 0, 1, 2, 1);
 
-        pane.add(emailField, 0, 2, 2, 1);
+        // === Education & Gender ===
+        Label highestEdLbl = new Label("Highest Educational Attainment");
+        TextField highestEdTxt = new TextField();
+        HBox highestEdBox = new HBox(10, highestEdLbl, highestEdTxt);
 
-        // === Position ===
-        pane.add(new Label("Position Applying For *"), 0, 3);
-        TextField positionField = new TextField();
-        pane.add(positionField, 0, 4, 2, 1);
+        Label genderLbl = new Label("Gender");
+        ToggleGroup genderGroup = new ToggleGroup();
+        RadioButton male = new RadioButton("Male");
+        RadioButton female = new RadioButton("Female");
+        RadioButton other = new RadioButton("Other");
+        male.setToggleGroup(genderGroup);
+        female.setToggleGroup(genderGroup);
+        other.setToggleGroup(genderGroup);
+        HBox genderBox = new HBox(10, male, female, other);
+        VBox genderVBox = new VBox(2, genderLbl, genderBox);
 
-        // === Phone + Start Date ===
-        pane.add(new Label("Phone *"), 0, 5);
-        TextField phoneField = new TextField();
+        HBox edGenderRow = new HBox(15, highestEdBox, genderVBox);
+        edGenderRow.setAlignment(Pos.CENTER_LEFT);
+        pane.add(edGenderRow, 0, 2, 2, 1);
 
-        pane.add(phoneField, 0, 6);
+        // === Position & Start Date ===
+        Label positionLbl = new Label("Position Desired");
+        TextField positionTxt = new TextField();
+        Label startDateLbl = new Label("Date Available");
+        DatePicker startDatePicker = new DatePicker(LocalDate.now());
+        HBox jobRow = new HBox(15, positionLbl, positionTxt, startDateLbl, startDatePicker);
+        jobRow.setAlignment(Pos.CENTER_LEFT);
+        pane.add(jobRow, 0, 3, 2, 1);
 
-        pane.add(new Label("When Can You Start? YYY-MM-DD"), 1, 5);
+        // === Desired Salary ===
+        Label salaryLbl = new Label("Desired Salary ($)");
+        TextField salaryTxt = new TextField();
+        pane.add(new HBox(10, salaryLbl, salaryTxt), 0, 4, 2, 1);
 
-        DatePicker startDatePicker = new DatePicker();
-        pane.add(startDatePicker, 1, 6);
+        // === Authorization ===
+        Label authLbl = new Label("Authorized to work in Canada?");
+        ToggleGroup authGroup = new ToggleGroup();
+        RadioButton authYes = new RadioButton("Yes");
+        RadioButton authNo = new RadioButton("No");
+        authYes.setToggleGroup(authGroup);
+        authNo.setToggleGroup(authGroup);
+        pane.add(new VBox(2, authLbl, new HBox(10, authYes, authNo)), 0, 5, 2, 1);
 
+        // === Related Employees ===
+        Label relatedLbl = new Label("Do you have relatives working here?");
+        ToggleGroup relatedGroup = new ToggleGroup();
+        RadioButton relYes = new RadioButton("Yes");
+        RadioButton relNo = new RadioButton("No");
+        relYes.setToggleGroup(relatedGroup);
+        relNo.setToggleGroup(relatedGroup);
+        TextField relativeExplainTxt = new TextField();
+        relativeExplainTxt.setPromptText("If yes, specify");
+        HBox relatedBox = new HBox(10, relYes, relNo, relativeExplainTxt);
+        pane.add(new VBox(2, relatedLbl, relatedBox), 0, 6, 2, 1);
 
-        
-        
         // === Relocate ===
-        pane.add(new Label("Willing to Relocate?"), 0, 7);
+        Label relocateLbl = new Label("Willing to Relocate?");
         ToggleGroup relocateGroup = new ToggleGroup();
+        RadioButton relocateYes = new RadioButton("Yes");
+        RadioButton relocateNo = new RadioButton("No");
+        RadioButton relocateUnsure = new RadioButton("Not Sure");
+        relocateYes.setToggleGroup(relocateGroup);
+        relocateNo.setToggleGroup(relocateGroup);
+        relocateUnsure.setToggleGroup(relocateGroup);
+        HBox relocateBox = new HBox(10, relocateYes, relocateNo, relocateUnsure);
+        pane.add(new VBox(2, relocateLbl, relocateBox), 0, 7, 2, 1);
 
-        RadioButton yes = new RadioButton("Yes");
-        RadioButton no = new RadioButton("No");
-        RadioButton unsure = new RadioButton("Not Sure");
-        yes.setToggleGroup(relocateGroup);
-        no.setToggleGroup(relocateGroup);
-        unsure.setToggleGroup(relocateGroup);
-        HBox relocateBox = new HBox(10, yes, no, unsure);
-        relocateBox.setAlignment(Pos.CENTER_LEFT);
-        pane.add(relocateBox, 0, 8, 2, 1);
-
- 
         // === Comments ===
-        pane.add(new Label("Comments"), 0, 9);
-        TextArea ta = new TextArea();
+        Label commentsLbl = new Label("Comments");
+        TextArea commentsArea = new TextArea();
+        commentsArea.setPrefRowCount(3);
+        pane.add(new VBox(2, commentsLbl, commentsArea), 0, 8, 2, 1);
 
-        ta.setPrefRowCount(2);
-        pane.add(ta, 0, 10, 2, 1);
-
-        // === Button ===
+        // === Buttons ===
         Button submitBtn = new Button("Send Application");
         Button viewBtn = new Button("Review Application");
         Button clearBtn = new Button("Clear Application");
-        HBox btnBox = new HBox(submitBtn, viewBtn, clearBtn);
+        HBox btnBox = new HBox(15, submitBtn, viewBtn, clearBtn);
         btnBox.setAlignment(Pos.CENTER);
-        btnBox.setPadding(new Insets(5, 0, 0, 0));
-        pane.add(btnBox, 0, 11, 2, 1);
-        SQLManager sqlManager = new SQLManager();
-        
-     // Pass form controls, not their text
-        SubmitHandler submitHandler = new SubmitHandler(
-            firstTxt, lastTxt, emailField, positionField, phoneField,
-            startDatePicker, relocateGroup, ta
-        );
-        
-        
-        
-        // Event Handling
-        submitBtn.setOnAction(submitHandler);      
-        clearBtn.setOnAction(event -> {
-        	Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        	alert.setTitle("Warning!");
-        	alert.setHeaderText("Are you sure you’d like to clear the application without saving?");
-        	alert.setContentText("All entered data will be lost.");
+        btnBox.setPadding(new Insets(10, 0, 0, 0));
+        pane.add(btnBox, 0, 9, 2, 1);
 
-        	Optional<ButtonType> result = alert.showAndWait();
-
-        	if (result.isPresent() && result.get() == ButtonType.OK) {
-        	    // ✅ user confirmed
-            	System.out.println("Application Cleared");
-                //Set the visible form inputs to show application details
-            	firstTxt.clear();
-                //Set it so that user cannot edit whats shown
-                firstTxt.setEditable(true);
-                
-                lastTxt.clear();
-                lastTxt.setEditable(true);
-                
-                emailField.clear();
-                emailField.setEditable(true);
-                
-                positionField.clear();
-                positionField.setEditable(true);
-                
-                phoneField.clear();
-                phoneField.setEditable(true);
-                
-                startDatePicker.setEditable(true);
-                startDatePicker.setDisable(false); // unlock
-
-        		yes.setSelected(false);
-        		no.setSelected(false);
-        		unsure.setSelected(false);
-
-        		yes.setDisable(false);
-        		no.setDisable(false);
-        		unsure.setDisable(false);
-                
-                
-                
-        		ta.clear();
-        		ta.setEditable(true);
-        	    // clear fields here
-        	} else {
-        	    // ❌ user canceled
-        	    System.out.println("Canceled.");
-        	}
-
-         
-
-        });
-        
-        viewBtn.setOnAction(event -> {
-            ReaderHandler readerHandler = new ReaderHandler();
-            readerHandler.handle(event); // Run your reader logic - will fetch application from DB + assign to readerHandler.application
-            
-            // Then do whatever else you need
-            System.out.println("Application ID: " + readerHandler.getId());
-            EmploymentApplication app = readerHandler.getApplication();
-            if (app != null) {
-                
-            	//Let console know which applicant is retrieved 
-            	System.out.println("Application retrieved: " + app.getFirstName());
-                //Set the visible form inputs to show application details
-            	firstTxt.setText(app.getFirstName());
-                //Set it so that user cannot edit whats shown
-                firstTxt.setEditable(false);
-                
-                lastTxt.setText(app.getLastName());
-                lastTxt.setEditable(false);
-                
-                emailField.setText(app.getEmail());
-                emailField.setEditable(false);
-                
-                positionField.setText(app.getPosition());
-                positionField.setEditable(false);
-                
-                phoneField.setText(app.getPhone());
-                phoneField.setEditable(false);
-                
-                //Date picker must be locked and set 
-                Date date = app.getStartDate(); // java.sql.Date
-                startDatePicker.setValue(date.toLocalDate()); // convert safely
-                startDatePicker.setEditable(false);
-                startDatePicker.setDisable(true); // fully lock
-
-                //Toggle group selection + lock
-                switch(app.getRelocate())
-                {
-                	case "Yes":
-                		yes.setSelected(true);
-                	case "No":
-                		no.setSelected(true);
-                	default:
-                		unsure.setSelected(true);
-
-                }
-        		yes.setDisable(true);
-        		no.setDisable(true);
-        		unsure.setDisable(true);
-                
-                
-                
-                ta.setText(app.getComments() + "\nThe fields for the application you've selected has been filled above.");
-                ta.setEditable(false);
-            }
-            else {
-            	System.out.println("No App Retrieved!");
-            }
-        });        
-        
         mainPane.setCenter(pane);
 
         // ===== Bottom Date =====
@@ -241,14 +150,52 @@ public class Main extends Application {
         mainPane.setBottom(bottomBox);
 
         // ===== Scene Setup =====
-        Scene scene = new Scene(mainPane, 500, 600);
+        Scene scene = new Scene(mainPane, 700, 750);
         primaryStage.setTitle("Employment Application Form");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        // ===== Submit Button Handler =====
+        submitBtn.setOnAction(e -> {
+            SubmitHandler handler = new SubmitHandler(
+                fullNameTxt,
+                addyTxt,
+                phoneTxt,
+                emailTxt,
+                highestEdTxt,
+                genderGroup,
+                startDatePicker,
+                positionTxt,
+                salaryTxt,
+                authGroup,
+                relatedGroup,
+                relativeExplainTxt,
+                relocateGroup,
+                commentsArea
+            );
+            handler.handle(e);
+        });
+
+        // ===== Clear Button Handler =====
+        clearBtn.setOnAction(e -> {
+            fullNameTxt.clear();
+            addyTxt.clear();
+            phoneTxt.clear();
+            emailTxt.clear();
+            highestEdTxt.clear();
+            genderGroup.selectToggle(null);
+            positionTxt.clear();
+            startDatePicker.setValue(LocalDate.now());
+            salaryTxt.clear();
+            authGroup.selectToggle(null);
+            relatedGroup.selectToggle(null);
+            relativeExplainTxt.clear();
+            relocateGroup.selectToggle(null);
+            commentsArea.clear();
+        });
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }
-    
 }
